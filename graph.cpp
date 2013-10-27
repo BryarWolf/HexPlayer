@@ -15,25 +15,27 @@ class Edge{
 public:
   Edge(Vertex *nextV, float edgeCost) {
     next = nextV;
-    cost = edgeCost
+    cost = edgeCost;
+  }
 };
 
 class Vertex{
-  std::list<Edge> *edges;
+  std::list<Edge> edges;
   int index;
 public:
   Vertex(int vIndex){
     index = vIndex; 
   }
-  void addEdge(Vertex *nextV, float cost){
-    edges.push_back(Edge(nextV, cost));
+  void addEdge(Vertex nextV, float cost){
+    edges.push_back(Edge(&nextV, cost));
   }
 };
 
 class Graph{
   std::list<Vertex> vertices;
 public:
-  void initGraph(int numV, float density, float range) {
+  void initGraph(int numV, float density, int range){
+    float cost;
     // create the vertex list
     for (int i=0; i<numV; i++){
       vertices.push_back(Vertex(i));
@@ -45,19 +47,22 @@ public:
     // iterate through the list of vertices to create edges 
     for (std::list<Vertex>::iterator j=vertices.begin(); j != vertices.end(); j++){
       // iterate through the list again to test for edges betwenn j and k
-      for (std:list<Vertex>::iterator k=vertices.begin(); k != vertices.end(); k++) {
-	  if (j == k) break;  // Ignore circular edges
-	  else {
-	    // test a random number to see if it is less than or equal to density
-	    if ((rand % 100) <= density) {
-	      // if test passed, add edge between vertex i and j with a random cost
-	      // between 1 and 10
-	      j.addEdge(&k, (rand() % 10 + 1));
-	    }
+      for (std::list<Vertex>::iterator k=vertices.begin(); k != vertices.end(); k++) {
+	if (j == k) break;  // Ignore circular edges
+	else {
+	  // test a random number to see if it is less than or equal to density
+	  if ((rand() % 100) <= density) {
+	    // if test passed, add edge between vertex i and j with a random cost
+	    // between 1 and 10
+	    cost = rand() % range + 1;
+	    j->addEdge(*k, cost);
 	  }
 	}
       }
     }
+  }
+  int numVertices() {
+    return vertices.size();
   }
 };
 
@@ -68,7 +73,7 @@ int main(int argc, char *argv[]) {
   }
   int numVertices = atoi(argv[1]); // Holds user entry for number of nodes
   float graphDensity = atof(argv[2]); // Holds user entry for graph density
-  float maxRange = atof(argv[3]); // Holds user entry for maximum range of edges
+  int maxRange = atoi(argv[3]); // Holds user entry for maximum range of edges
   std::cout << "User Entry for graph size: " << numVertices << std::endl;
   std::cout << "Graph density: " << graphDensity << std::endl;
   std::cout << "Distance range: 1-" << maxRange << std::endl;
